@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>GTA V Modding Hub</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--red:#e8403a;--red2:#c93030;--bg:#0a0a0c;--bg2:#111114;--bg3:#17171b;--bg4:#1e1e24;--border:#2a2a32;--text:#e8e8f0;--muted:#888;--font:'Segoe UI',system-ui,sans-serif}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+.hero{position:relative;min-height:520px;display:flex;align-items:center;justify-content:center;text-align:center;overflow:hidden}
+.hero-bg{position:absolute;inset:0;background:url('https://images.unsplash.com/photo-1542751371-adc38448a05e?w=1600&q=80') center/cover no-repeat;filter:brightness(0.2) saturate(1.5)}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(232,64,58,0.05) 1px,transparent 1px),linear-gradient(90deg,rgba(232,64,58,0.05) 1px,transparent 1px);background-size:60px 60px;opacity:0.6}
+.hero-fade{position:absolute;inset:0;background:linear-gradient(to bottom,transparent 50%,var(--bg) 100%)}
+.hero-content{position:relative;z-index:2;max-width:800px;padding:3rem 1.5rem}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:8px;background:rgba(232,64,58,0.15);border:1px solid rgba(232,64,58,0.3);color:var(--red);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:6px 16px;border-radius:100px;margin-bottom:20px}
+.hero-eyebrow::before{content:'';width:6px;height:6px;background:var(--red);border-radius:50%;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(1.5)}}
+.hero h1{font-size:clamp(2.2rem,6vw,4rem);font-weight:900;color:#fff;line-height:1.05;letter-spacing:-1px;margin-bottom:18px;text-shadow:0 0 60px rgba(232,64,58,0.3)}
+.hero h1 span{color:var(--red)}
+.hero p{font-size:1.1rem;color:rgba(255,255,255,0.65);line-height:1.7;max-width:560px;margin:0 auto 32px}
+.hero-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.btn-primary{padding:13px 30px;background:var(--red);color:#fff;font-size:0.9rem;font-weight:700;border-radius:8px;border:none;cursor:pointer;transition:all 0.2s;text-decoration:none;display:inline-block}
+.btn-primary:hover{background:var(--red2);transform:translateY(-1px)}
+.btn-secondary{padding:13px 30px;background:rgba(255,255,255,0.08);color:#fff;font-size:0.9rem;font-weight:700;border-radius:8px;border:1px solid rgba(255,255,255,0.15);cursor:pointer;transition:all 0.2s;text-decoration:none;display:inline-block;backdrop-filter:blur(10px)}
+.btn-secondary:hover{background:rgba(255,255,255,0.14)}
+.search-wrap{background:var(--bg2);border-bottom:1px solid var(--border);padding:1rem 1.5rem}
+.search-inner{max-width:1100px;margin:0 auto;position:relative}
+.search-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:16px;pointer-events:none}
+#searchInput{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px 16px 12px 42px;color:var(--text);font-size:0.9rem;font-family:var(--font);outline:none;transition:border-color 0.2s}
+#searchInput:focus{border-color:var(--red)}
+#searchInput::placeholder{color:var(--muted)}
+#searchResults{display:none;position:absolute;top:calc(100% + 8px);left:0;right:0;background:var(--bg3);border:1px solid var(--border);border-radius:10px;z-index:200;overflow:hidden;box-shadow:0 20px 40px rgba(0,0,0,0.5)}
+.search-item{padding:12px 16px;cursor:pointer;display:flex;align-items:center;gap:12px;transition:background 0.15s;text-decoration:none;color:var(--text)}
+.search-item:hover{background:var(--bg4)}
+.search-item-icon{font-size:18px;width:32px;text-align:center}
+.search-item-text{font-size:0.85rem}
+.search-item-tag{font-size:10px;color:var(--muted);margin-top:2px}
+.stats-bar{background:var(--bg2);border-bottom:1px solid var(--border)}
+.stats-inner{max-width:1100px;margin:0 auto;display:flex;justify-content:center}
+.stat{flex:1;max-width:180px;text-align:center;padding:1.2rem 1rem;border-right:1px solid var(--border)}
+.stat:last-child{border-right:none}
+.stat-num{font-size:1.7rem;font-weight:900;background:linear-gradient(135deg,var(--red),#ff6b6b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.stat-label{font-size:0.7rem;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);margin-top:3px}
+.tabs-wrap{background:var(--bg2);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;backdrop-filter:blur(10px)}
+.tabs{display:flex;max-width:1100px;margin:0 auto;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{padding:1rem 1.3rem;font-size:0.82rem;font-weight:600;letter-spacing:0.3px;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:all 0.2s;background:none;border-top:none;border-left:none;border-right:none}
+.tab:hover{color:#ccc}
+.tab.active{color:#fff;border-bottom-color:var(--red)}
+.section{display:none;max-width:1100px;margin:0 auto;padding:2.5rem 1.5rem}
+.section.active{display:block}
+.sec-banner{position:relative;height:240px;border-radius:16px;overflow:hidden;margin-bottom:2.5rem}
+.sec-banner img{width:100%;height:100%;object-fit:cover;display:block}
+.sec-banner-overlay{position:absolute;inset:0;background:linear-gradient(105deg,rgba(0,0,0,0.9) 0%,rgba(0,0,0,0.3) 100%);display:flex;align-items:center;padding:2.5rem}
+.sec-banner h2{font-size:1.9rem;font-weight:800;color:#fff;margin-bottom:8px;letter-spacing:-0.5px}
+.sec-banner p{font-size:0.9rem;color:rgba(255,255,255,0.7);max-width:420px;line-height:1.6}
+.sec-label{font-size:0.75rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--red);margin-bottom:1rem;display:flex;align-items:center;gap:10px}
+.sec-label::after{content:'';flex:1;height:1px;background:var(--border)}
+.checklist{background:var(--bg3);border:1px solid var(--border);border-radius:14px;padding:1.5rem;margin-bottom:2.5rem}
+.checklist-title{font-size:1rem;font-weight:700;color:#fff;margin-bottom:4px}
+.checklist-sub{font-size:0.82rem;color:var(--muted);margin-bottom:1.2rem}
+.checklist-progress{height:6px;background:var(--bg4);border-radius:100px;margin-bottom:1.5rem;overflow:hidden}
+.checklist-bar{height:100%;background:linear-gradient(90deg,var(--red),#ff6b6b);border-radius:100px;transition:width 0.4s ease;width:0%}
+.check-item{display:flex;align-items:flex-start;gap:14px;padding:10px 0;border-bottom:1px solid var(--border);cursor:pointer}
+.check-item:last-child{border-bottom:none}
+.check-box{width:22px;height:22px;border-radius:6px;border:2px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all 0.2s;margin-top:1px}
+.check-box.done{background:var(--red);border-color:var(--red)}
+.check-box.done::after{content:'✓';color:#fff;font-size:12px;font-weight:700}
+.check-text h4{font-size:0.88rem;font-weight:600;color:#fff;margin-bottom:2px}
+.check-text p{font-size:0.78rem;color:var(--muted);line-height:1.5}
+.card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-bottom:2.5rem}
+.card{background:var(--bg3);border:1px solid var(--border);border-radius:14px;overflow:hidden;transition:all 0.25s;position:relative}
+.card:hover{border-color:rgba(232,64,58,0.4);transform:translateY(-3px);box-shadow:0 20px 40px rgba(0,0,0,0.4)}
+.card-img{width:100%;height:160px;object-fit:cover;display:block}
+.card-placeholder{width:100%;height:160px;background:var(--bg4);display:flex;align-items:center;justify-content:center;font-size:3rem}
+.card-body{padding:1.3rem}
+.card-badge{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:3px 10px;border-radius:100px;width:fit-content;margin-bottom:10px;display:inline-block}
+.badge-red{color:var(--red);background:rgba(232,64,58,0.12);border:1px solid rgba(232,64,58,0.2)}
+.badge-green{color:#4ec94e;background:rgba(78,201,78,0.1);border:1px solid rgba(78,201,78,0.2)}
+.badge-blue{color:#5b9cf6;background:rgba(91,156,246,0.1);border:1px solid rgba(91,156,246,0.2)}
+.badge-orange{color:#f0a030;background:rgba(240,160,48,0.1);border:1px solid rgba(240,160,48,0.2)}
+.badge-purple{color:#b06ef3;background:rgba(176,110,243,0.1);border:1px solid rgba(176,110,243,0.2)}
+.card h3{font-size:1rem;font-weight:700;color:#fff;margin-bottom:8px}
+.card p{font-size:0.82rem;color:#aaa;line-height:1.6;margin-bottom:14px}
+.card-actions{display:flex;gap:8px;flex-wrap:wrap}
+.btn-dl{padding:8px 16px;background:var(--red);color:#fff;font-size:0.78rem;font-weight:700;border-radius:6px;text-decoration:none;transition:background 0.2s;border:none;cursor:pointer;display:inline-block}
+.btn-dl:hover{background:var(--red2)}
+.btn-ol{padding:8px 16px;background:transparent;color:var(--red);font-size:0.78rem;font-weight:700;border-radius:6px;text-decoration:none;border:1px solid rgba(232,64,58,0.4);transition:all 0.2s;display:inline-block}
+.btn-ol:hover{background:rgba(232,64,58,0.1)}
+.skill{display:inline-block;font-size:10px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;padding:3px 10px;border-radius:100px;margin-bottom:10px}
+.skill-easy{background:rgba(78,201,78,0.1);color:#4ec94e;border:1px solid rgba(78,201,78,0.2)}
+.skill-med{background:rgba(240,160,48,0.1);color:#f0a030;border:1px solid rgba(240,160,48,0.2)}
+.skill-hard{background:rgba(232,64,58,0.1);color:#e87070;border:1px solid rgba(232,64,58,0.2)}
+.img-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin-bottom:2.5rem}
+.img-tile{position:relative;border-radius:12px;overflow:hidden;height:190px;cursor:pointer}
+.img-tile img{width:100%;height:100%;object-fit:cover;display:block;transition:transform 0.4s ease}
+.img-tile:hover img{transform:scale(1.06)}
+.img-tile-label{position:absolute;bottom:0;left:0;right:0;padding:12px 14px;background:linear-gradient(to top,rgba(0,0,0,0.9),transparent);font-size:0.8rem;font-weight:600;color:#fff}
+.safety-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-bottom:2.5rem}
+.s-card{background:var(--bg3);border-radius:12px;padding:1.3rem;display:flex;gap:14px;border:1px solid var(--border)}
+.s-card.red{border-left:3px solid #e84040}
+.s-card.green{border-left:3px solid #40c860}
+.s-card.blue{border-left:3px solid #5b9cf6}
+.s-icon{font-size:1.8rem;flex-shrink:0;line-height:1}
+.s-card h3{font-size:0.9rem;font-weight:700;color:#fff;margin-bottom:5px}
+.s-card p{font-size:0.8rem;color:#999;line-height:1.6}
+.compat-wrap{background:var(--bg3);border:1px solid var(--border);border-radius:14px;padding:1.5rem;margin-bottom:2.5rem}
+.compat-title{font-size:1rem;font-weight:700;color:#fff;margin-bottom:4px}
+.compat-sub{font-size:0.82rem;color:var(--muted);margin-bottom:1.2rem}
+.compat-mods{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:1.2rem}
+.compat-mod{padding:7px 14px;background:var(--bg4);border:1px solid var(--border);border-radius:8px;font-size:0.8rem;color:#ccc;cursor:pointer;transition:all 0.2s;user-select:none}
+.compat-mod.selected{background:rgba(232,64,58,0.15);border-color:var(--red);color:#fff}
+.compat-result{padding:1rem;border-radius:10px;font-size:0.83rem;line-height:1.6;display:none}
+.compat-result.ok{background:rgba(78,201,78,0.08);border:1px solid rgba(78,201,78,0.2);color:#4ec94e}
+.compat-result.warn{background:rgba(240,160,48,0.08);border:1px solid rgba(240,160,48,0.2);color:#f0a030}
+.compat-result.bad{background:rgba(232,64,58,0.08);border:1px solid rgba(232,64,58,0.2);color:#e87070}
+.faq-item{background:var(--bg3);border:1px solid var(--border);border-radius:12px;margin-bottom:8px;overflow:hidden}
+.faq-q{padding:1.1rem 1.3rem;font-size:0.9rem;font-weight:600;color:#fff;cursor:pointer;display:flex;justify-content:space-between;align-items:center;transition:background 0.2s}
+.faq-q:hover{background:var(--bg4)}
+.faq-arrow{color:var(--muted);font-size:18px;transition:transform 0.25s;flex-shrink:0}
+.faq-a{max-height:0;overflow:hidden;transition:max-height 0.3s ease}
+.faq-a-inner{padding:0 1.3rem 1.1rem;font-size:0.83rem;color:#999;line-height:1.7;border-top:1px solid var(--border)}
+.faq-item.open .faq-arrow{transform:rotate(45deg)}
+.link-group{margin-bottom:2rem}
+.link-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px}
+.link-card{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:1rem 1.2rem;display:flex;align-items:center;gap:12px;text-decoration:none;transition:all 0.2s;color:var(--text)}
+.link-card:hover{border-color:rgba(232,64,58,0.4);transform:translateY(-2px)}
+.link-icon{font-size:1.6rem;flex-shrink:0}
+.link-info h4{font-size:0.88rem;font-weight:700;color:#fff;margin-bottom:2px}
+.link-info p{font-size:0.75rem;color:var(--muted)}
+.link-arrow{margin-left:auto;color:var(--muted);font-size:14px}
+.updated-badge{display:inline-flex;align-items:center;gap:6px;background:var(--bg3);border:1px solid var(--border);border-radius:100px;padding:5px 14px;font-size:0.75rem;color:var(--muted);margin-bottom:2rem}
+.updated-dot{width:7px;height:7px;background:#4ec94e;border-radius:50%}
+.mod-banner-img{position:relative;height:170px;overflow:hidden}
+.mod-banner-img img{width:100%;height:100%;object-fit:cover;transition:transform 0.4s}
+.card:hover .mod-banner-img img{transform:scale(1.04)}
+.mod-banner-img-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.85),transparent 60%);display:flex;align-items:flex-end;padding:12px 14px}
+.mod-banner-title{font-size:1.2rem;font-weight:900;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,0.8)}
+footer{border-top:1px solid var(--border);padding:2.5rem 1.5rem;margin-top:2rem}
+.footer-inner{max-width:1100px;margin:0 auto;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:1rem}
+.footer-left p{font-size:0.78rem;color:var(--muted)}
+.footer-links{display:flex;gap:16px;flex-wrap:wrap}
+.footer-links a{font-size:0.78rem;color:var(--muted);text-decoration:none;transition:color 0.2s}
+.footer-links a:hover{color:var(--red)}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-fade"></div>
+  <div class="hero-content">
+    <div class="hero-eyebrow">2026 Community Edition</div>
+    <h1>The Ultimate<br><span>GTA V Modding</span> Hub</h1>
+    <p>Everything you need to start modding — from your first install to building your own world. Free tools, clear guides, and a safe community.</p>
+    <div class="hero-btns">
+      <button class="btn-primary" onclick="switchTab('start')">🚀 Get Started</button>
+      <button class="btn-secondary" onclick="switchTab('mods')">🎮 Browse Mods</button>
+    </div>
+  </div>
+</div>
+
+<div class="search-wrap">
+  <div class="search-inner">
+    <span class="search-icon">🔍</span>
+    <input id="searchInput" type="text" placeholder="Search tools, mods, guides... (e.g. 'police mod' or 'crash fix')" oninput="handleSearch(this.value)" onblur="setTimeout(()=>hideSearch(),200)"/>
+    <div id="searchResults"></div>
+  </div>
+</div>
+
+<div class="stats-bar">
+  <div class="stats-inner">
+    <div class="stat"><div class="stat-num">10K+</div><div class="stat-label">Mods Available</div></div>
+    <div class="stat"><div class="stat-num">4</div><div class="stat-label">Core Tools</div></div>
+    <div class="stat"><div class="stat-num">3</div><div class="stat-label">World Builders</div></div>
+    <div class="stat"><div class="stat-num">100%</div><div class="stat-label">Free</div></div>
+  </div>
+</div>
+
+<div class="tabs-wrap">
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('start')">🚀 Getting Started</button>
+    <button class="tab" onclick="switchTab('tools')">🔧 Tools</button>
+    <button class="tab" onclick="switchTab('world')">🌍 World Building</button>
+    <button class="tab" onclick="switchTab('mods')">🎮 Popular Mods</button>
+    <button class="tab" onclick="switchTab('compat')">⚙️ Compatibility</button>
+    <button class="tab" onclick="switchTab('safety')">🔒 Safety</button>
+    <button class="tab" onclick="switchTab('faq')">❓ FAQ</button>
+    <button class="tab" onclick="switchTab('links')">🔗 All Links</button>
+  </div>
+</div>
+
+<div class="section active" id="tab-start">
+  <div class="updated-badge"><div class="updated-dot"></div> Last verified April 2026 — all links checked</div>
+  <div class="sec-banner">
+    <img src="https://images.unsplash.com/photo-1542751371-adc38448a05e?w=1200&q=80" alt="GTA V Modding"/>
+    <div class="sec-banner-overlay"><div><h2>Welcome to GTA V Modding</h2><p>Transform GTA V into anything you can imagine. Better graphics, police roleplay, new cities — all free, all community-made.</p></div></div>
+  </div>
+  <div class="sec-label">Your beginner checklist</div>
+  <div class="checklist">
+    <div class="checklist-title">🎯 Setup Progress</div>
+    <div class="checklist-sub">Tick each step as you complete it!</div>
+    <div class="checklist-progress"><div class="checklist-bar" id="progressBar"></div></div>
+    <div class="check-item" onclick="toggleCheck('c1')"><div class="check-box" id="c1"></div><div class="check-text"><h4>Install Script Hook V</h4><p>The most important tool — lets mods talk to the game.</p></div></div>
+    <div class="check-item" onclick="toggleCheck('c2')"><div class="check-box" id="c2"></div><div class="check-text"><h4>Install Script Hook V .NET</h4><p>Required by most popular mods including LSPDFR.</p></div></div>
+    <div class="check-item" onclick="toggleCheck('c3')"><div class="check-box" id="c3"></div><div class="check-text"><h4>Install OpenIV</h4><p>Safe file manager that creates a protected mods folder.</p></div></div>
+    <div class="check-item" onclick="toggleCheck('c4')"><div class="check-box" id="c4"></div><div class="check-text"><h4>Install Gameconfig</h4><p>Prevents crashes when running multiple mods at once.</p></div></div>
+    <div class="check-item" onclick="toggleCheck('c5')"><div class="check-box" id="c5"></div><div class="check-text"><h4>Back up your GTA V folder</h4><p>Copy your GTA V folder before installing anything.</p></div></div>
+    <div class="check-item" onclick="toggleCheck('c6')"><div class="check-box" id="c6"></div><div class="check-text"><h4>Download your first mod from GTA5-Mods.com</h4><p>Browse, find something you like, and install in Story Mode only.</p></div></div>
+  </div>
+  <div class="sec-label">How it all works</div>
+  <div class="card-grid">
+    <div class="card"><div class="card-placeholder">1️⃣</div><div class="card-body"><div class="card-badge badge-red">First Step</div><h3>Install the 4 helper tools</h3><p>Before any mod will work, you need 4 free programs installed. Head to the <strong style="color:#fff">Tools tab</strong> — they install in under 10 minutes total.</p></div></div>
+    <div class="card"><div class="card-placeholder">2️⃣</div><div class="card-body"><div class="card-badge badge-red">Second Step</div><h3>Pick a mod you like</h3><p>Visit <a href="https://www.gta5-mods.com" target="_blank" style="color:var(--red)">GTA5-Mods.com</a> — over 10,000 free mods sorted by category. Every mod has install instructions and community reviews.</p></div></div>
+    <div class="card"><div class="card-placeholder">3️⃣</div><div class="card-body"><div class="card-badge badge-red">Third Step</div><h3>Install and enjoy</h3><p>Most mods just need you to copy a file into your GTA V folder. Launch in <strong style="color:#fff">Story Mode only</strong> — never Online. Your mod is active immediately.</p></div></div>
+  </div>
+  <div class="sec-label">What mods can do</div>
+  <div class="img-grid">
+    <div class="img-tile"><img src="https://images.unsplash.com/photo-1493711662062-fa541adb3fc8?w=800&q=80" alt="Graphics"/><div class="img-tile-label">📸 Make graphics look photorealistic</div></div>
+    <div class="img-tile"><img src="https://images.unsplash.com/photo-1525507119028-ed4c629a60a3?w=800&q=80" alt="Police"/><div class="img-tile-label">🚔 Play as a police officer</div></div>
+    <div class="img-tile"><img src="https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=800&q=80" alt="Cities"/><div class="img-tile-label">🌆 Explore entirely new cities</div></div>
+  </div>
+</div>
+
+<div class="section" id="tab-tools">
+  <div class="sec-banner"><img src="https://images.unsplash.com/photo-1518770660439-4636190af475?w=1200&q=80" alt="Tools"/><div class="sec-banner-overlay"><div><h2>The 4 Essential Tools</h2><p>Install all four in order before downloading any mods. All completely free.</p></div></div></div>
+  <div class="sec-label">Install in this exact order</div>
+  <div class="card-grid">
+    <div class="card"><img class="card-img" src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&q=80" alt="Script Hook V"/><div class="card-body"><div class="card-badge badge-red">Install First</div><h3>Script Hook V</h3><p>The most important tool. Runs in the background and allows mods to communicate with GTA V. <strong style="color:#fff">Almost no mod works without this.</strong> Update it after every GTA V update.</p><div class="card-actions"><a class="btn-dl" href="https://www.dev-c.com/gtav/scripthookv/" target="_blank">Download Free</a></div></div></div>
+    <div class="card"><img class="card-img" src="https://images.unsplash.com/photo-1504639725590-34d0984388bd?w=800&q=80" alt="SHVDN"/><div class="card-body"><div class="card-badge badge-orange">Install Second</div><h3>Script Hook V .NET</h3><p>A companion tool that lets C# mods run — this includes LSPDFR and AI mods. <strong style="color:#fff">Many popular mods will not load without this.</strong></p><div class="card-actions"><a class="btn-dl" href="https://github.com/scripthookvdotnet/scripthookvdotnet/releases" target="_blank">Download Free</a></div></div></div>
+    <div class="card"><img class="card-img" src="https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=800&q=80" alt="OpenIV"/><div class="card-body"><div class="card-badge badge-blue">Install Third</div><h3>OpenIV</h3><p>A safe file manager for GTA V. Creates a protected <strong style="color:#fff">/mods/ folder</strong> so you never touch the original game files. Essential for texture and map mods.</p><div class="card-actions"><a class="btn-dl" href="https://openiv.com/" target="_blank">Download Free</a></div></div></div>
+    <div class="card"><img class="card-img" src="https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=800&q=80" alt="Gameconfig"/><div class="card-body"><div class="card-badge badge-green">Install Fourth</div><h3>Gameconfig.xml</h3><p>GTA V has hidden limits on how many things it can load. <strong style="color:#fff">Gameconfig raises those limits</strong> and prevents crashes when running multiple mods.</p><div class="card-actions"><a class="btn-dl" href="https://www.gta5-mods.com/misc/gameconfig-xml-dilapidated" target="_blank">Download Free</a></div></div></div>
+  </div>
+</div>
+
+<div class="section" id="tab-world">
+  <div class="sec-banner"><img src="https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=1200&q=80" alt="World Building"/><div class="sec-banner-overlay"><div><h2>Build Your Own World</h2><p>Place buildings, design roads, and create entire cities from scratch inside GTA V.</p></div></div></div>
+  <div class="sec-label">What the community has built</div>
+  <div class="img-grid">
+    <div class="img-tile"><img src="https://images.unsplash.com/photo-1519074069444-1ba4fff66d16?w=800&q=80" alt="Roads"/><div class="img-tile-label">🛣️ Custom roads and highways</div></div>
+    <div class="img-tile"><img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80" alt="Landscapes"/><div class="img-tile-label">🏔️ Sculpted mountain landscapes</div></div>
+    <div class="img-tile"><img src="https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=800&q=80" alt="Cities"/><div class="img-tile-label">🏙️ Fully custom city districts</div></div>
+  </div>
+  <div class="sec-label">3 tools — pick based on your skill level</div>
+  <div class="card-grid">
+    <div class="card"><img class="card-img" src="https://images.unsplash.com/photo-1587614382346-4ec70e388b28?w=800&q=80" alt="Map Builder"/><div class="card-body"><span class="skill skill-easy">Beginner Friendly</span><h3>Map Builder</h3><p>Adds thousands of extra props not in the base game. <strong style="color:#fff">Required by most downloadable maps.</strong> Install it once and forget about it.</p><div class="card-actions"><a class="btn-dl" href="https://www.gta5-mods.com/maps/map-builder" target="_blank">Download Free</a></div></div></div>
+    <div class="card"><img class="card-img" src="https://images.unsplash.com/photo-1617396900799-f4ec2b43c7ae?w=800&q=80" alt="Map Editor"/><div class="card-body"><span class="skill skill-med">Some Experience</span><h3>Map Editor</h3><p>Place and move objects <strong style="color:#fff">while inside the game</strong> in real time. Perfect for film sets, race tracks, and roleplay environments.</p><div class="card-actions"><a class="btn-dl" href="https://www.gta5-mods.com/scripts/map-editor" target="_blank">Download Free</a></div></div></div>
+    <div class="card"><img class="card-img" src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=800&q=80" alt="CodeWalker"/><div class="card-body"><span class="skill skill-hard">Advanced</span><h3>CodeWalker</h3><p>View and edit <strong style="color:#fff">the entire GTA V world in 3D</strong> on your desktop. Used by professional modders to build things like Liberty City V.</p><div class="card-actions"><a class="btn-dl" href="https://github.com/dexyfex/CodeWalker" target="_blank">Download Free</a><a class="btn-ol" href="https://github.com/dexyfex/CodeWalker" target="_blank">GitHub</a></div></div></div>
+  </div>
+</div>
+
+<div class="section" id="tab-mods">
+  <div class="sec-banner"><img src="https://images.unsplash.com/photo-1493711662062-fa541adb3fc8?w=1200&q=80" alt="Mods"/><div class="sec-banner-overlay"><div><h2>Most Popular Mods</h2><p>Community favourites — all free, all for Story Mode.</p></div></div></div>
+  <div class="sec-label">Community favourites</div>
+  <div class="card-grid">
+    <div class="card"><div class="mod-banner-img"><img src="https://images.unsplash.com/photo-1525507119028-ed4c629a60a3?w=800&q=80" alt="LSPDFR"/><div class="mod-banner-img-overlay"><span class="mod-banner-title">LSPDFR</span></div></div><div class="card-body"><div class="card-badge badge-blue">Police Roleplay</div><h3>LSPD First Response</h3><p>Become an LSPD officer. Respond to emergencies — chases, robberies, traffic stops and arrests. <strong style="color:#fff">Millions of players worldwide.</strong></p><div class="card-actions"><a class="btn-dl" href="https://www.lcpdfr.com/lspdfr/index/" target="_blank">Download Free</a><a class="btn-ol" href="https://www.lcpdfr.com/" target="_blank">Website</a></div></div></div>
+    <div class="card"><div class="mod-banner-img"><img src="https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=800&q=80" alt="NVE"/><div class="mod-banner-img-overlay"><span class="mod-banner-title">NaturalVision Evolved</span></div></div><div class="card-body"><div class="card-badge badge-green">Graphics Overhaul</div><h3>NaturalVision Evolved</h3><p>Makes GTA V look so realistic it <strong style="color:#fff">can be mistaken for real video footage.</strong> Rebuilds lighting, weather, reflections and colours completely.</p><div class="card-actions"><a class="btn-dl" href="https://www.gta5-mods.com/misc/naturalvision-evolved" target="_blank">Download Free</a></div></div></div>
+    <div class="card"><div class="mod-banner-img"><img src="https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=800&q=80" alt="Liberty City V"/><div class="mod-banner-img-overlay"><span class="mod-banner-title">Liberty City V</span></div></div><div class="card-body"><div class="card-badge badge-purple">Map Expansion</div><h3>Liberty City V</h3><p>Fans spent <strong style="color:#fff">years rebuilding Liberty City from GTA IV</strong> inside GTA V. Fly there by plane from Los Santos. Completely free.</p><div class="card-actions"><a class="btn-dl" href="https://www.gta5-mods.com/maps/liberty-city-preservation-project" target="_blank">Download Free</a></div></div></div>
+  </div>
+  <div class="sec-label">Where to find more mods</div>
+  <div class="safety-grid">
+    <div class="s-card blue"><div class="s-icon">🌐</div><div><h3>GTA5-Mods.com</h3><p>Biggest safe mod repository — 10,000+ free mods with reviews and guides. <a href="https://www.gta5-mods.com" target="_blank" style="color:#5b9cf6">Visit →</a></p></div></div>
+    <div class="s-card blue"><div class="s-icon">🎮</div><div><h3>FiveM Forums</h3><p>Best place for FiveM multiplayer mods and server resources. <a href="https://forum.cfx.re" target="_blank" style="color:#5b9cf6">Visit →</a></p></div></div>
+  </div>
+</div>
+
+<div class="section" id="tab-compat">
+  <div class="sec-banner"><img src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=800&q=80" alt="Compatibility"/><div class="sec-banner-overlay"><div><h2>Mod Compatibility Checker</h2><p>Select your installed mods and check for known conflicts.</p></div></div></div>
+  <div class="compat-wrap">
+    <div class="compat-title">🔍 Check Your Mod Setup</div>
+    <div class="compat-sub">Select all the mods you currently have installed — we'll warn you about known conflicts.</div>
+    <div class="compat-mods">
+      <div class="compat-mod" onclick="toggleMod(this,'shv')">Script Hook V</div>
+      <div class="compat-mod" onclick="toggleMod(this,'shvdn')">Script Hook V .NET</div>
+      <div class="compat-mod" onclick="toggleMod(this,'openiv')">OpenIV</div>
+      <div class="compat-mod" onclick="toggleMod(this,'gameconfig')">Gameconfig</div>
+      <div class="compat-mod" onclick="toggleMod(this,'lspdfr')">LSPDFR</div>
+      <div class="compat-mod" onclick="toggleMod(this,'nve')">NaturalVision Evolved</div>
+      <div class="compat-mod" onclick="toggleMod(this,'lcv')">Liberty City V</div>
+      <div class="compat-mod" onclick="toggleMod(this,'mapbuilder')">Map Builder</div>
+      <div class="compat-mod" onclick="toggleMod(this,'mapeditor')">Map Editor</div>
+      <div class="compat-mod" onclick="toggleMod(this,'codewalker')">CodeWalker</div>
+      <div class="compat-mod" onclick="toggleMod(this,'rph')">RAGE Plugin Hook</div>
+      <div class="compat-mod" onclick="toggleMod(this,'redux')">GTA V Redux</div>
+    </div>
+    <button class="btn-dl" onclick="checkCompat()" style="margin-bottom:12px">Check Compatibility</button>
+    <div class="compat-result" id="compatResult"></div>
+  </div>
+  <div class="sec-label">Known requirements</div>
+  <div class="card-grid">
+    <div class="card"><div class="card-body"><div class="card-badge badge-red">Requires</div><h3>LSPDFR needs:</h3><p>Script Hook V ✓<br>Script Hook V .NET ✓<br>RAGE Plugin Hook ✓</p></div></div>
+    <div class="card"><div class="card-body"><div class="card-badge badge-blue">Requires</div><h3>Liberty City V needs:</h3><p>OpenIV ✓<br>Map Builder ✓<br>Gameconfig ✓</p></div></div>
+    <div class="card"><div class="card-body"><div class="card-badge badge-green">Requires</div><h3>NaturalVision Evolved needs:</h3><p>OpenIV ✓<br>Gameconfig (recommended) ✓</p></div></div>
+    <div class="card"><div class="card-body"><div class="card-badge badge-orange">Conflict</div><h3>Known conflicts:</h3><p>NVE + Redux — do not use both graphics overhauls at once. They overwrite the same files and will cause crashes.</p></div></div>
+  </div>
+</div>
+
+<div class="section" id="tab-safety">
+  <div class="sec-banner"><img src="https://images.unsplash.com/photo-1614064641938-3bbee52942c7?w=1200&q=80" alt="Safety"/><div class="sec-banner-overlay"><div><h2>Stay Safe While Modding</h2><p>Follow these 6 rules and you will never have a problem.</p></div></div></div>
+  <div class="sec-label">The 6 golden rules</div>
+  <div class="safety-grid">
+    <div class="s-card red"><div class="s-icon">🚫</div><div><h3>Rule 1 — Never mod GTA Online</h3><p>BattlEye detects mods instantly. Your account gets <strong>permanently banned</strong> with zero warnings. Story Mode only — always.</p></div></div>
+    <div class="s-card green"><div class="s-icon">✅</div><div><h3>Rule 2 — Story Mode is 100% safe</h3><p>Mod Story Mode as much as you want. Zero risk to your account. Experiment freely with no consequences.</p></div></div>
+    <div class="s-card blue"><div class="s-icon">🎮</div><div><h3>Rule 3 — FiveM is officially approved</h3><p>Rockstar officially acquired FiveM in 2023. Playing on FiveM servers is <strong>fully permitted</strong>. No ban risk.</p></div></div>
+    <div class="s-card red"><div class="s-icon">⚠️</div><div><h3>Rule 4 — Trusted sources only</h3><p>Only download from <strong>GTA5-Mods.com</strong> and <strong>forum.cfx.re</strong>. Discord links and unknown sites commonly distribute malware.</p></div></div>
+    <div class="s-card green"><div class="s-icon">💾</div><div><h3>Rule 5 — Always back up first</h3><p>Copy your entire GTA V folder before installing any mod. If something breaks, restore in minutes without re-downloading.</p></div></div>
+    <div class="s-card blue"><div class="s-icon">🔄</div><div><h3>Rule 6 — Update after GTA updates</h3><p>Every Rockstar patch breaks Script Hook V. <strong>Update Script Hook V immediately</strong> after any GTA V update or the game will crash.</p></div></div>
+  </div>
+</div>
+
+<div class="section" id="tab-faq">
+  <div class="sec-banner"><img src="https://images.unsplash.com/photo-1432888622747-4eb9a8efeb07?w=1200&q=80" alt="FAQ"/><div class="sec-banner-overlay"><div><h2>Frequently Asked Questions</h2><p>The most common questions new modders ask — answered simply.</p></div></div></div>
+  <div class="sec-label">Common questions</div>
+  <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-q">Will modding get me banned? <span class="faq-arrow">+</span></div><div class="faq-a"><div class="faq-a-inner">Only if you use mods in GTA Online. Modding Story Mode carries absolutely zero ban risk. FiveM is also completely safe as it was officially acquired by Rockstar. The danger only exists in GTA Online where anti-cheat software is active.</div></div></div>
+  <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-q">Does modding work on PS5 or Xbox? <span class="faq-arrow">+</span></div><div class="faq-a"><div class="faq-a-inner">No. All mods on this page are for PC only (Windows). Console versions of GTA V do not support mods of any kind. You need the PC version on Steam, Epic Games Store, or the Rockstar Launcher.</div></div></div>
+  <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-q">My game crashes after installing a mod — what do I do? <span class="faq-arrow">+</span></div><div class="faq-a"><div class="faq-a-inner">The most common cause is an outdated Script Hook V after a GTA update. First: update Script Hook V from dev-c.com. If that doesn't fix it, download the latest Gameconfig. If it still crashes, remove the last mod you installed as it may be incompatible with your game version.</div></div></div>
+  <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-q">Do I need to pay for any of these mods or tools? <span class="faq-arrow">+</span></div><div class="faq-a"><div class="faq-a-inner">No — every single tool and mod listed on this page is 100% free. Script Hook V, OpenIV, SHVDN, Gameconfig, LSPDFR, NaturalVision Evolved, Liberty City V — all completely free. Be very suspicious of anyone asking you to pay for GTA V mods on unofficial sites.</div></div></div>
+  <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-q">Can I use mods on FiveM? <span class="faq-arrow">+</span></div><div class="faq-a"><div class="faq-a-inner">Yes, but it works differently. FiveM has its own resource system — most mods are installed by server owners on the server side. As a player, you join a server and the mods load automatically. Some client-side mods exist but always check a server's rules before using them.</div></div></div>
+  <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-q">What is the difference between Story Mode and GTA Online? <span class="faq-arrow">+</span></div><div class="faq-a"><div class="faq-a-inner">Story Mode is the single-player campaign — just you and the game world, no other players. This is where ALL modding should happen. GTA Online is the multiplayer mode where Rockstar actively monitors for cheats and mods. Never mix the two.</div></div></div>
+  <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-q">How do I uninstall a mod if something goes wrong? <span class="faq-arrow">+</span></div><div class="faq-a"><div class="faq-a-inner">If you used OpenIV and the /mods/ folder (which you should), simply delete the mod files from your /mods/ folder — your original game files are untouched. Never delete files from the main game directory — only from the /mods/ subfolder.</div></div></div>
+  <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-q">Script Hook V says "Game version not supported" — help! <span class="faq-arrow">+</span></div><div class="faq-a"><div class="faq-a-inner">This means GTA V was recently updated and Script Hook V hasn't been updated yet to match. The solution is to wait — Alexander Blade usually releases an update within a day or two. Check dev-c.com regularly after any GTA patch.</div></div></div>
+</div>
+
+<div class="section" id="tab-links">
+  <div class="sec-banner"><img src="https://images.unsplash.com/photo-1432888622747-4eb9a8efeb07?w=1200&q=80" alt="Links"/><div class="sec-banner-overlay"><div><h2>All Links in One Place</h2><p>Every tool, mod, and community site — verified for 2026.</p></div></div></div>
+  <div class="sec-label">Essential tools — install in order</div>
+  <div class="link-group"><div class="link-grid">
+    <a class="link-card" href="https://www.dev-c.com/gtav/scripthookv/" target="_blank"><div class="link-icon">⚙️</div><div class="link-info"><h4>Script Hook V</h4><p>Core mod runtime — install first</p></div><div class="link-arrow">↗</div></a>
+    <a class="link-card" href="https://github.com/scripthookvdotnet/scripthookvdotnet/releases" target="_blank"><div class="link-icon">🔩</div><div class="link-info"><h4>Script Hook V .NET</h4><p>Required for C# mods like LSPDFR</p></div><div class="link-arrow">↗</div></a>
+    <a class="link-card" href="https://openiv.com/" target="_blank"><div class="link-icon">📁</div><div class="link-info"><h4>OpenIV</h4><p>Safe GTA file manager</p></div><div class="link-arrow">↗</div></a>
+    <a class="link-card" href="https://www.gta5-mods.com/misc/gameconfig-xml-dilapidated" target="_blank"><div class="link-icon">🛡️</div><div class="link-info"><h4>Gameconfig.xml</h4><p>Crash prevention</p></div><div class="link-arrow">↗</div></a>
+  </div></div>
+  <div class="sec-label">World building tools</div>
+  <div class="link-group"><div class="link-grid">
+    <a class="link-card" href="https://www.gta5-mods.com/maps/map-builder" target="_blank"><div class="link-icon">🧱</div><div class="link-info"><h4>Map Builder</h4><p>Extra prop library</p></div><div class="link-arrow">↗</div></a>
+    <a class="link-card" href="https://www.gta5-mods.com/scripts/map-editor" target="_blank"><div class="link-icon">🗺️</div><div class="link-info"><h4>Map Editor</h4><p>In-game placement tool</p></div><div class="link-arrow">↗</div></a>
+    <a class="link-card" href="https://github.com/dexyfex/CodeWalker" target="_blank"><div class="link-icon">🌍</div><div class="link-info"><h4>CodeWalker</h4><p>Advanced 3D map editor</p></div><div class="link-arrow">↗</div></a>
+  </div></div>
+  <div class="sec-label">Popular mods</div>
+  <div class="link-group"><div class="link-grid">
+    <a class="link-card" href="https://www.lcpdfr.com/lspdfr/index/" target="_blank"><div class="link-icon">🚔</div><div class="link-info"><h4>LSPDFR</h4><p>Police roleplay mod</p></div><div class="link-arrow">↗</div></a>
+    <a class="link-card" href="https://www.gta5-mods.com/misc/naturalvision-evolved" target="_blank"><div class="link-icon">📸</div><div class="link-info"><h4>NaturalVision Evolved</h4><p>Photorealistic graphics</p></div><div class="link-arrow">↗</div></a>
+    <a class="link-card" href="https://www.gta5-mods.com/maps/liberty-city-preservation-project" target="_blank"><div class="link-icon">🏙️</div><div class="link-info"><h4>Liberty City V</h4><p>GTA IV city in GTA V</p></div><div class="link-arrow">↗</div></a>
+  </div></div>
+  <div class="sec-label">Community websites</div>
+  <div class="link-group"><div class="link-grid">
+    <a class="link-card" href="https://www.gta5-mods.com" target="_blank"><div class="link-icon">🌐</div><div class="link-info"><h4>GTA5-Mods.com</h4><p>Biggest free mod repository</p></div><div class="link-arrow">↗</div></a>
+    <a class="link-card" href="https://forum.cfx.re" target="_blank"><div class="link-icon">🎮</div><div class="link-info"><h4>FiveM Forums</h4><p>Official FiveM community</p></div><div class="link-arrow">↗</div></a>
+    <a class="link-card" href="https://www.lcpdfr.com" target="_blank"><div class="link-icon">👮</div><div class="link-info"><h4>LCPDFR Community</h4><p>Police mod community</p></div><div class="link-arrow">↗</div></a>
+  </div></div>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-left"><p style="font-weight:700;color:#fff;margin-bottom:4px">GTA V Modding Hub</p><p>Community resource — not affiliated with Rockstar Games or Take-Two Interactive.</p><p style="margin-top:4px">Last verified: April 2026</p></div>
+    <div class="footer-links"><a href="https://www.gta5-mods.com" target="_blank">GTA5-Mods.com</a><a href="https://forum.cfx.re" target="_blank">FiveM Forums</a><a href="https://www.lcpdfr.com" target="_blank">LCPDFR</a><a href="https://openiv.com" target="_blank">OpenIV</a></div>
+  </div>
+</footer>
+
+<script>
+const tabIds=['start','tools','world','mods','compat','safety','faq','links'];
+function switchTab(n){document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));document.getElementById('tab-'+n).classList.add('active');document.querySelectorAll('.tab')[tabIds.indexOf(n)].classList.add('active');window.scrollTo({top:0,behavior:'smooth'})}
+const checks={};
+function toggleCheck(id){checks[id]=!checks[id];const el=document.getElementById(id);el.classList.toggle('done',checks[id]);const done=Object.values(checks).filter(Boolean).length;document.getElementById('progressBar').style.width=(done/6*100)+'%'}
+const searchData=[{icon:'⚙️',title:'Script Hook V',desc:'Core mod runtime',tab:'tools'},{icon:'🔩',title:'Script Hook V .NET',desc:'Required for LSPDFR',tab:'tools'},{icon:'📁',title:'OpenIV',desc:'Safe GTA file manager',tab:'tools'},{icon:'🛡️',title:'Gameconfig',desc:'Crash prevention',tab:'tools'},{icon:'🚔',title:'LSPDFR',desc:'Police roleplay mod',tab:'mods'},{icon:'📸',title:'NaturalVision Evolved',desc:'Graphics overhaul',tab:'mods'},{icon:'🏙️',title:'Liberty City V',desc:'New city map',tab:'mods'},{icon:'🧱',title:'Map Builder',desc:'Extra props',tab:'world'},{icon:'🗺️',title:'Map Editor',desc:'In-game placement',tab:'world'},{icon:'🌍',title:'CodeWalker',desc:'3D map editor',tab:'world'},{icon:'🔒',title:'Safety Rules',desc:'How to mod safely',tab:'safety'},{icon:'❓',title:'FAQ',desc:'Common questions',tab:'faq'},{icon:'⚙️',title:'Compatibility Checker',desc:'Check mod conflicts',tab:'compat'}];
+function handleSearch(val){const r=document.getElementById('searchResults');if(!val.trim()){r.style.display='none';return}const q=val.toLowerCase();const results=searchData.filter(d=>d.title.toLowerCase().includes(q)||d.desc.toLowerCase().includes(q));if(!results.length){r.style.display='none';return}r.innerHTML=results.slice(0,6).map(d=>`<div class="search-item" onclick="switchTab('${d.tab}');hideSearch();document.getElementById('searchInput').value=''"><div class="search-item-icon">${d.icon}</div><div><div class="search-item-text">${d.title}</div><div class="search-item-tag">${d.desc}</div></div></div>`).join('');r.style.display='block'}
+function hideSearch(){document.getElementById('searchResults').style.display='none'}
+function toggleFaq(el){const isOpen=el.classList.contains('open');document.querySelectorAll('.faq-item').forEach(f=>{f.classList.remove('open');f.querySelector('.faq-a').style.maxHeight='0'});if(!isOpen){el.classList.add('open');const a=el.querySelector('.faq-a');a.style.maxHeight=a.scrollHeight+'px'}}
+const selected=new Set();
+function toggleMod(el,id){if(selected.has(id)){selected.delete(id);el.classList.remove('selected')}else{selected.add(id);el.classList.add('selected')}}
+function checkCompat(){const r=document.getElementById('compatResult');r.style.display='block';const issues=[];const warnings=[];if(selected.has('lspdfr')&&!selected.has('shv'))issues.push('LSPDFR requires Script Hook V');if(selected.has('lspdfr')&&!selected.has('shvdn'))issues.push('LSPDFR requires Script Hook V .NET');if(selected.has('lspdfr')&&!selected.has('rph'))warnings.push('LSPDFR works best with RAGE Plugin Hook');if(selected.has('lcv')&&!selected.has('openiv'))issues.push('Liberty City V requires OpenIV');if(selected.has('lcv')&&!selected.has('mapbuilder'))issues.push('Liberty City V requires Map Builder');if(selected.has('lcv')&&!selected.has('gameconfig'))warnings.push('Liberty City V strongly recommends Gameconfig');if(selected.has('nve')&&selected.has('redux'))issues.push('NaturalVision Evolved and Redux CONFLICT — do not use both');if(selected.has('nve')&&!selected.has('openiv'))issues.push('NaturalVision Evolved requires OpenIV');if(selected.has('mapeditor')&&!selected.has('shv'))issues.push('Map Editor requires Script Hook V');if(selected.size===0){r.className='compat-result warn';r.innerHTML='⚠️ Please select at least one mod to check.';return}if(issues.length){r.className='compat-result bad';r.innerHTML='❌ <strong>Issues found:</strong><br>• '+issues.join('<br>• ')+(warnings.length?'<br><br>⚠️ <strong>Warnings:</strong><br>• '+warnings.join('<br>• '):'')}else if(warnings.length){r.className='compat-result warn';r.innerHTML='⚠️ <strong>Looks mostly good, but:</strong><br>• '+warnings.join('<br>• ')}else{r.className='compat-result ok';r.innerHTML='✅ <strong>All good!</strong> No conflicts detected. You\'re ready to go!'}}
+</script>
+</body>
+</html>
